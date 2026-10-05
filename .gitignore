@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/*.zip
+.npm-cache/
+reports/*.json
+!reports/analogy-index.json
+coverage/
+*.log
+.DS_Store

@@ -1,0 +1,614 @@
+{
+  "prompt_name": "offline-bilingual-bank-backend-academy",
+  "prompt_version": "2.0",
+  "target_agent": "AI coding agent (GPT 6.1 Sol)",
+
+  "how_to_use_this_prompt": [
+    "This document is the complete specification. Read all of it once, then save it verbatim as docs/SPEC.json so any later session can re-read it after a context reset.",
+    "If two requirements conflict, resolve them in this priority order and log the conflict in docs/DECISIONS.md: (1) truthful status and verified offline operation, (2) technical and domain accuracy, (3) complete Arabic/English parity, (4) completeness of the specified scope, (5) visual polish.",
+    "Every number in this spec (quotas, counts, budgets) is a minimum unless it says otherwise.",
+    "Library versions are not fixed here. Pick the current stable release of each tool at build time, pin it exactly (save-exact=true), commit the lockfile, and record the versions in docs/DECISIONS.md.",
+    "Use the system clock (date command) for every timestamp and for the content_reviewed_as_of field. Never guess today's date."
+  ],
+
+  "execution_mode": {
+    "type": "zero_shot_autonomous",
+    "rules": [
+      "Do NOT ask the user any questions. Make every decision yourself.",
+      "When something is ambiguous, pick the most sensible option and record it in docs/DECISIONS.md as: id, date, decision, one-line reason.",
+      "Work continuously until the whole project is delivered. Do not stop after a plan, a scaffold, or a single module.",
+      "Assume your context can be reset at any moment. The repo, PROGRESS.json, and HANDOFF.md must always be enough for a cold start by a different agent.",
+      "Never claim something is done unless it was built, run, and verified. Never fabricate command output. If something cannot be verified in this environment (for example no browser can be installed), set the task to blocked with the reason, still write the code and tests, and say so honestly in the final report.",
+      "No placeholders, stubs, TODO text, or lorem ipsum on main. A lesson that is not finished stays out of the published navigation (status 'planned' in content/curriculum.json), so every commit is a coherent, buildable app.",
+      "You may use the network while online to install packages, fonts, browsers, and tools. After installation, nothing may need the network to build, test, run, or use the app.",
+      "Do not ask the user to perform manual steps. If a step truly cannot be automated, document it in HANDOFF.md."
+    ]
+  },
+
+  "role": "Senior banking-systems backend architect, bilingual (Arabic/English) technical educator, and senior frontend engineer. Stance: conservative, vendor-neutral, and accuracy-first. Never claim knowledge of how a specific real bank works internally.",
+
+  "objective": "Build a complete, frontend-only, fully bilingual (Arabic RTL + English LTR) learning application that works 100% offline and teaches every backend concept needed to build bank software. The app is the deliverable: a polished, visual, interactive course with no backend server.",
+
+  "audience": {
+    "level": "Learner who wants to master banking backend engineering end to end",
+    "assumed_background": "Can read basic code and SQL and knows what HTTP and a database table are. No banking background is assumed.",
+    "style": "Plain language, short sentences, concrete banking examples, every term defined on first use, no unexplained jargon",
+    "languages": ["en", "ar"]
+  },
+
+  "environment_preflight": [
+    "Before any other work, record node -v, npm -v, git --version, OS, free disk space, whether the network is reachable, and whether Chromium can be installed for Playwright. Save this to docs/ENVIRONMENT.md.",
+    "Use a current LTS Node. Pin it in .nvmrc and package.json engines. Use .npmrc with save-exact=true.",
+    "If a mandated tool cannot be installed after reasonable attempts, choose the closest mature alternative, log it in docs/DECISIONS.md, and keep the intent of the requirement. Never silently drop a verification step.",
+    "Create 'npm run check' early. It runs typecheck, lint, lint:rtl, validate:content, and unit tests. It is the minimum gate for every commit."
+  ],
+
+  "tech_decisions": {
+    "philosophy": "Use the best, most mature, widely supported tools. Download and bundle everything locally while online. Avoid exotic or abandoned libraries. Only use dependencies and fonts with permissive licenses (MIT, Apache-2.0, BSD, ISC, OFL). No GPL or AGPL code in the shipped bundle.",
+    "recommended_stack": {
+      "framework": "React 19 + TypeScript (strict) + Vite. SvelteKit or Astro (static output) are allowed only with a stronger justification recorded in DECISIONS.md.",
+      "styling": "Tailwind CSS using logical utilities (ms-, me-, ps-, pe-, start-, end-, text-start, text-end) and rtl:/ltr: variants for icon mirroring. Accessible headless components (Radix UI primitives or shadcn/ui source copied into the repo).",
+      "routing": "React Router HashRouter, so the built app also works from any plain static server and from the packaged serve.mjs.",
+      "state_and_storage": "Zustand for UI state. IndexedDB (Dexie or idb-keyval) with a localStorage fallback for progress, notes, bookmarks, review-queue state, and settings. Provide JSON export/import of all learner data and a confirmed reset. Call navigator.storage.persist() and show storage status in Settings.",
+      "diagrams": "Run the RTL diagram spike first (see diagram_system). Preferred pipeline: build-time pre-render of Mermaid to static SVG with mermaid-cli using the Chromium that Playwright installs, so no Mermaid runtime ships. Fallback: Mermaid bundled via npm and rendered client-side. Use hand-written inline SVG React components for the simulator visuals, analogy illustrations, and any diagram type that fails the spike. Use CSS animation or Framer Motion for step-through animation, and respect prefers-reduced-motion.",
+      "code_highlighting": "Build-time highlighting with Shiki (JS regex engine, only the needed grammars) or Prism, bundled locally. Grammars: SQL, TypeScript, Java, Python, JSON, pseudo-code. Code blocks are always dir=ltr and scroll horizontally on overflow.",
+      "search": "FlexSearch or Lunr. One index per language built at build time, lazy-loaded, and precached. Arabic and English queries must also find entries through the glossary alias map (an Arabic query for a term finds lessons that use its English name, and the reverse).",
+      "pwa": "vite-plugin-pwa / Workbox with precaching of all assets and all lesson JSON, registerType 'prompt' (never reload the page mid-lesson without consent), and an 'offline ready' notice.",
+      "testing": "Vitest + React Testing Library, fast-check for property tests, ajv for JSON Schema, Playwright with @axe-core/playwright. Full offline e2e runs on Chromium. Firefox and WebKit run smoke and RTL layout checks only.",
+      "runnable_exercises_optional": "SQL exercises run in-browser with sql.js (SQLite WASM bundled locally and precached). JavaScript exercises run in a sandboxed Web Worker. If this is cut for time, exercises fall back to read-the-solution mode. Record the decision."
+    },
+    "fonts": "Self-host variable woff2 subsets with font-display swap and unicode-range splitting. Arabic: one of Cairo, IBM Plex Sans Arabic, or Noto Naskh Arabic (pick for long-text readability and record why). Latin: Inter or IBM Plex Sans. Monospace for code: JetBrains Mono or IBM Plex Mono. Real system-font fallback stacks. Ship the font license files and generate THIRD_PARTY_LICENSES.",
+    "app_security": "Add a strict Content-Security-Policy (default-src 'self'; no remote origins; 'wasm-unsafe-eval' only if sql.js is used) both as a meta tag and as a header in serve.mjs. Render content with a small safe inline-markup parser. Never use dangerouslySetInnerHTML for lesson text. No analytics or telemetry of any kind.",
+    "backend": "NONE. Static frontend only. All content ships as local JSON files.",
+    "budgets": [
+      "Initial route JS at most 350 KB gzipped, with route-level code splitting. Lessons, diagrams, and search indexes load lazily but are all precached.",
+      "Total precache size is logged on every build. If it exceeds 80 MB, justify it in DECISIONS.md or reduce it."
+    ]
+  },
+
+  "bilingual_requirements": {
+    "languages": {
+      "en": { "direction": "ltr", "label": "English" },
+      "ar": { "direction": "rtl", "label": "العربية", "variety": "Modern Standard Arabic, simple and clear, not overly literary" }
+    },
+    "rules": [
+      "BOTH languages are first-class and complete. Every lesson, quiz, glossary entry, diagram label, simulator label, error message, and UI string exists in both Arabic and English.",
+      "Arabic is written natively, not word-by-word translated. Use natural phrasing. Use the SAME analogies and facts in both languages (choose analogies that work in both cultures; never swap analogies per language, because parity of meaning is required).",
+      "Terminology is decided once, in the glossary, and never improvised inside lessons. Lessons reference terms with the token {{term:<glossary-id>}}. The renderer prints 'Arabic (English)' on the first use in a lesson, for example القيد المزدوج (Double-Entry Bookkeeping), and only the Arabic term afterwards. Terms flagged keep_latin (API, JWT, SQL, ACID, ISO 8583) stay in Latin script inside Arabic text.",
+      "A language toggle in the header switches instantly with no reload and no network. The choice is saved locally. Default to the first match in navigator.languages (ar* gives Arabic), else English. Switching keeps the current route, tab, scroll position, and simulator state, updates document title, sets lang and dir on the html element, and announces the change through an aria-live region.",
+      "Full RTL support using CSS logical properties only. Mirror directional icons (arrows, chevrons, back/next, progress direction). Do not mirror logos, numerals, play/pause, checkmarks, or clock icons. The sidebar flips side.",
+      "Bidirectional text safety: wrap code, SQL, JSON, identifiers, amounts, currency codes, URLs, and numbers in dir=ltr isolated spans (bdi or unicode-bidi isolate). Use dir=auto for user-written notes. Put lang attributes on inline foreign-language spans. Test mixed strings such as 'تحويل (Transfer) 100.00 USD'.",
+      "Arabic typography: generous line-height (about 1.8 for body text), no letter-spacing on Arabic text, and no italics for Arabic.",
+      "Numerals: a setting for Western digits (0-9) or Arabic-Indic digits, default Western. Format with Intl using an explicit numbering system (for example ar-u-nu-latn or ar-u-nu-arab), because ar locales default to Arabic-Indic digits in some engines. Money always shows the currency code, formatted from integer minor units using the bundled ISO 4217 table.",
+      "Plurals: UI strings with counts define all CLDR plural categories for Arabic (zero, one, two, few, many, other) and are tested.",
+      "Diagrams: every diagram renders in both languages from one shared structure with translated labels (see diagram_system). Test RTL rendering explicitly.",
+      "Search works in both languages. For Arabic, normalize at index and query time: strip diacritics (tashkeel) and tatweel, unify alef forms (أ إ آ to ا), unify ى/ي and ة/ه where sensible, and strip the definite article ال at token level for matching. Convert Arabic-Indic digits to Western digits before indexing.",
+      "Printable cheat sheets work in both languages with correct direction, using print CSS with logical properties.",
+      "Add lint:rtl. It fails the build if source files use physical direction utilities or properties (ml-, mr-, pl-, pr-, left-, right-, text-left, text-right, margin-left, padding-right, and so on) outside an explicit allowlist with reasons.",
+      "validate:content enforces parity (see validation_suite)."
+    ],
+    "i18n_stack": "react-i18next (or the framework equivalent) for UI strings in src/i18n/en.json and ar.json, plus bilingual content objects in lesson JSON."
+  },
+
+  "offline_requirements": {
+    "principle": "The learner builds and downloads everything while ONLINE, then uses the result fully OFFLINE.",
+    "rules": [
+      "No CDN links anywhere. All JS, CSS, fonts, icons, diagram code, WASM, and syntax grammars are installed via npm or downloaded into the repo and bundled.",
+      "PWA: web manifest, icons (including maskable), and a service worker that precaches every asset and every lesson, glossary, diagram, and search-index file in both languages on first load. Navigation, search, simulators, and language switching work with the network off. Updates are applied only after user consent.",
+      "Add a Content-Security-Policy that blocks all non-self origins, so any remote reference fails loudly.",
+      "verify:offline has two parts. (1) Static scan of the built output for any http(s) URL, remote @import, remote font, script, style, image, or iframe reference pointing outside the app, using an allowlist file (scripts/offline-allowlist.json) where every entry has a reason, for example XML namespace identifiers like the W3C SVG namespace that are never fetched. (2) Precache completeness: every built file that the app can request appears in the service worker precache manifest, including lesson JSON for both languages. It fails on any violation.",
+      "test:e2e:offline (Playwright, Chromium) loads the app online once in a persistent browser context, waits for the service worker to be activated and precaching to finish, closes the browser, relaunches with the same profile and the network blocked, then verifies: every route; every lesson loads in both languages; every diagram renders; all six simulators work; search works in Arabic and English (including diacritic and alef variants); the language toggle works; theme and numeral settings persist; progress persists across reload. During this test any request to a non-local origin fails the test.",
+      "Also run the same smoke suite against the packaged output served by serve.mjs.",
+      "serve.mjs is a zero-dependency Node static server. It binds to 127.0.0.1 by default, prevents path traversal, sends correct MIME types (including .webmanifest, .woff2, .json, .svg, .wasm), sends the CSP header, accepts a --port flag, falls back to a free port if busy, and prints the URL.",
+      "file:// mode: browsers block module scripts and fetch on file:// and do not run service workers there. Either (a) provide 'build:file', a second build target that emits a single classic (IIFE) bundle with all content inlined and hash routing, tested through a file:// URL in Playwright, with documented limits (no PWA install), or (b) do not claim that opening index.html works, and say in README-OFFLINE that serve.mjs is required. Record which option you chose and why.",
+      "package:offline produces release/bank-academy-offline.zip containing: the built static site, serve.mjs, SHA256SUMS, THIRD_PARTY_LICENSES, VERSION, and a bilingual README-OFFLINE (Arabic + English) with exact steps for Windows, macOS, and Linux. A script test unzips it into a temp folder, starts serve.mjs, and runs the smoke suite.",
+      "PWA install works from http://localhost or https only. README-OFFLINE explains this, plus how to install on desktop, Android, and iOS, how to use airplane mode, what happens if the browser clears site data, and how to export learner data as a backup.",
+      "Commit package-lock.json. 'npm run vendor:deps' fills a local npm cache (.npm-cache), stores the Playwright browsers and the mermaid-cli browser in a local folder (set PLAYWRIGHT_BROWSERS_PATH), and writes an archive, so the project can be rebuilt later with 'npm ci --offline --cache .npm-cache'. Document the exact commands, and state that Node itself must be installed separately (record the required version).",
+      "Provide scripts: dev, build, preview, check, typecheck, lint, lint:rtl, validate:content, build:diagrams, build:search, build:file (if chosen), verify:offline, test, test:e2e:offline, smoke:lesson, progress:sync, package:offline, vendor:deps.",
+      "README explains in both languages: install while online, build, serve locally, install the PWA, and use in airplane mode."
+    ]
+  },
+
+  "content_requirements": {
+    "storage_format": "All course content is structured JSON under /content: lessons in content/lessons/<lesson-id>.json, glossary in content/glossary/, diagram specs inside lessons or content/diagrams/, and the course map in content/curriculum.json. Schemas live in /content/schema/ (lesson.schema.json, glossary.schema.json, curriculum.schema.json, JSON Schema 2020-12). The UI renders from these files only.",
+
+    "bilingual_field_convention": "Every human-readable string is an object {\"en\": \"...\", \"ar\": \"...\"}. Plain strings are allowed only for ids, enums, currency codes, and code. Inline markup allowed inside text: **bold**, `code`, {{term:<id>}}, {{lesson:<id>}}. No HTML.",
+
+    "code_block_spec": "Code is a structured object so code stays language-neutral and comments are bilingual: {\"lang\": \"sql|ts|java|python|json|pseudo\", \"caption\": {en, ar}, \"lines\": [{\"code\": \"UPDATE accounts SET balance = balance - 10000 WHERE id = 1 AND balance >= 10000\", \"comment\": {en, ar} (optional), \"mark\": \"bad|good|note\" (optional)}]}. The renderer adds the right comment syntax per language. Lines are arrays, never strings with escaped newlines.",
+
+    "curriculum_map": {
+      "note": "Lesson ids are fixed. Never merge or drop a lesson. You may split a lesson only if its estimated time exceeds 35 minutes (log it). Lessons marked (gap-fill) are additions to the original topic list. Total: 82 lessons. Write prerequisites and next_lessons yourself; the graph must be acyclic.",
+      "modules": [
+        {
+          "id": "01", "title": { "en": "Banking Domain Foundations", "ar": "أساسيات المجال المصرفي" },
+          "lessons": [
+            "01-how-banks-work | How banks work",
+            "01-accounts-customers-products | Accounts, customers, products",
+            "01-account-lifecycle-states | Account lifecycle and states: pending, active, dormant, frozen, closed (gap-fill)",
+            "01-core-vs-digital-layers | Core banking vs digital banking layers",
+            "01-ledger-vs-balance | Ledger vs account balance",
+            "01-banking-vocabulary | Banking vocabulary tour (feeds the glossary)"
+          ]
+        },
+        {
+          "id": "02", "title": { "en": "Money and Data Correctness", "ar": "صحة الأموال والبيانات" },
+          "lessons": [
+            "02-never-float-for-money | Never use floating point for money",
+            "02-minor-units-vs-decimal | Integers in minor units vs decimal types",
+            "02-currencies-minor-units-rounding | Currencies, minor units (0, 2, and 3 decimal places), and rounding rules",
+            "02-multi-currency-fx | Multi-currency accounts and FX conversion: quotes, spread, rate expiry (gap-fill)",
+            "02-time-timezones-business-days | Time, timezones, and business days (including weekend differences between countries)",
+            "02-immutable-records-reversals | Immutable records: reversals instead of deletes"
+          ]
+        },
+        {
+          "id": "03", "title": { "en": "Ledger and Accounting", "ar": "دفتر الأستاذ والمحاسبة" },
+          "lessons": [
+            "03-double-entry-bookkeeping | Double-entry bookkeeping",
+            "03-chart-of-accounts | Chart of accounts",
+            "03-journal-entries-postings | Journal entries and postings",
+            "03-pending-posted-available-balance | Pending vs posted vs available balance",
+            "03-holds-authorizations | Holds and authorizations",
+            "03-interest-fees-eod-batch | Interest, fees, and end-of-day batch jobs",
+            "03-reconciliation-settlement | Reconciliation and settlement"
+          ]
+        },
+        {
+          "id": "04", "title": { "en": "Transactions and Concurrency", "ar": "المعاملات والتزامن" },
+          "lessons": [
+            "04-acid-in-depth | ACID in depth",
+            "04-isolation-levels-anomalies | Isolation levels and the anomalies each one allows",
+            "04-race-conditions-double-spend | Race conditions and double-spend",
+            "04-pessimistic-vs-optimistic-locking | Pessimistic vs optimistic locking",
+            "04-deadlocks | Deadlocks",
+            "04-idempotency-keys | Idempotency keys",
+            "04-exactly-once-myth | Exactly-once myth vs at-least-once plus idempotency",
+            "04-retries-backoff-jitter-timeouts | Retries, backoff, jitter, timeouts"
+          ]
+        },
+        {
+          "id": "05", "title": { "en": "Distributed Systems for Banking", "ar": "الأنظمة الموزعة للبنوك" },
+          "lessons": [
+            "05-cap-consistency-models | CAP and consistency models",
+            "05-sagas-compensation | Sagas and compensating transactions",
+            "05-two-phase-commit | Two-phase commit and why it is avoided",
+            "05-outbox-pattern | Outbox pattern",
+            "05-event-sourcing-cqrs | Event sourcing and CQRS",
+            "05-queues-dlq-ordering | Message queues, dead letter queues, ordering",
+            "05-circuit-breakers-bulkheads | Circuit breakers and bulkheads",
+            "05-monolith-vs-microservices | Monolith vs microservices for banks"
+          ]
+        },
+        {
+          "id": "06", "title": { "en": "Payments and Interbank Systems", "ar": "المدفوعات والأنظمة بين البنوك" },
+          "lessons": [
+            "06-card-payment-lifecycle | Card payment lifecycle (authorize, capture, clearing, settlement, chargeback)",
+            "06-payment-schemes-overview | ACH, SEPA, wire, SWIFT, instant payments (state that schemes differ per country)",
+            "06-iso8583-iso20022 | ISO 8583 and ISO 20022 overview",
+            "06-payment-state-machines | Payment state machines",
+            "06-reversals-refunds-chargebacks | Reversals, refunds, and chargebacks",
+            "06-reconciliation-files-cutoffs | Reconciliation files and cut-off times"
+          ]
+        },
+        {
+          "id": "07", "title": { "en": "Security", "ar": "الأمان" },
+          "lessons": [
+            "07-authentication | Authentication: passwords, MFA, sessions, JWT, OAuth2/OIDC",
+            "07-open-banking-consent | Third-party access and consent (open banking style); varies by country (gap-fill)",
+            "07-authorization-maker-checker | Authorization: RBAC, ABAC, least privilege, maker-checker (four-eyes)",
+            "07-encryption-transit-rest | Encryption in transit and at rest",
+            "07-keys-hsm-tokenization | Key management, HSMs, tokenization",
+            "07-secrets-management | Secrets management",
+            "07-owasp-api-top-10 | OWASP API Top 10 for banking",
+            "07-pci-dss-basics | PCI DSS basics",
+            "07-audit-logging-tamper-evidence | Audit logging and tamper evidence",
+            "07-insider-threat-controls | Insider threat controls"
+          ]
+        },
+        {
+          "id": "08", "title": { "en": "Compliance and Risk", "ar": "الامتثال وإدارة المخاطر" },
+          "lessons": [
+            "08-kyc-onboarding | KYC and onboarding",
+            "08-aml-sanctions-screening | AML monitoring and sanctions screening",
+            "08-fraud-detection-basics | Fraud detection basics (rules, velocity checks, limits)",
+            "08-privacy-retention-erasure | Data privacy, retention, right to erasure vs legal retention",
+            "08-regulatory-reporting-audit-trails | Regulatory reporting and audit trails"
+          ]
+        },
+        {
+          "id": "09", "title": { "en": "API and Database Design", "ar": "تصميم الواجهات وقواعد البيانات" },
+          "lessons": [
+            "09-rest-api-financial-operations | REST API design for financial operations",
+            "09-versioning-compatibility | Versioning and backward compatibility",
+            "09-pagination-filtering-rate-limiting | Pagination, filtering, rate limiting",
+            "09-error-handling-codes | Error handling and error codes",
+            "09-ledger-schema-design | Schema design for ledgers",
+            "09-indexing-query-performance | Indexing and query performance",
+            "09-zero-downtime-migrations | Migrations with zero downtime",
+            "09-replication-sharding-partitioning | Replication, sharding, partitioning",
+            "09-caching-never-cache | Caching: what must never be cached"
+          ]
+        },
+        {
+          "id": "10", "title": { "en": "Reliability and Operations", "ar": "الموثوقية والتشغيل" },
+          "lessons": [
+            "10-ha-dr-rpo-rto | High availability and disaster recovery (RPO/RTO)",
+            "10-backups-restore-drills | Backups and restore drills",
+            "10-observability | Observability: logs, metrics, traces",
+            "10-alerting-incident-response | Alerting and incident response",
+            "10-feature-flags-safe-rollouts | Feature flags and safe rollouts",
+            "10-capacity-planning-peaks | Capacity planning and peak loads (salary days, holidays)",
+            "10-chaos-testing | Chaos testing"
+          ]
+        },
+        {
+          "id": "11", "title": { "en": "Testing and Quality", "ar": "الاختبار والجودة" },
+          "lessons": [
+            "11-test-types | Unit, integration, contract, and end-to-end tests",
+            "11-property-based-testing-ledgers | Property-based testing for ledgers",
+            "11-testing-concurrency-bugs | Testing concurrency bugs",
+            "11-test-data-pii-safety | Test data and PII safety",
+            "11-cicd-regulated | CI/CD for regulated environments"
+          ]
+        },
+        {
+          "id": "12", "title": { "en": "Capstone: Reference Bank Backend Blueprint", "ar": "المشروع الختامي: مخطط نظام بنكي" },
+          "lessons": [
+            "12-architecture-blueprint | Full architecture diagram",
+            "12-end-to-end-walkthrough | End-to-end walkthrough: open account, deposit, transfer, card purchase, statement",
+            "12-build-order-roadmap | Suggested build order and milestone roadmap",
+            "12-production-readiness-checklist | Production readiness checklist",
+            "12-learning-roadmap-further-reading | Learning roadmap and further reading as plain text (names of standards and books only, no external links)"
+          ]
+        }
+      ],
+      "simulator_hosts": {
+        "ledger-playground": "03-double-entry-bookkeeping",
+        "isolation-levels": "04-isolation-levels-anomalies",
+        "double-spend-race": "04-race-conditions-double-spend",
+        "idempotency-retry": "04-idempotency-keys",
+        "saga-stepper": "05-sagas-compensation",
+        "card-lifecycle": "06-card-payment-lifecycle"
+      }
+    },
+
+    "lesson_quotas": {
+      "note": "Single source of truth for per-lesson minimums. The validator enforces all of them. Quotas apply to every lesson; for lessons where code does not fit (for example vocabulary or roadmap lessons), adapt wrong_vs_right to 'common misunderstanding vs correct mental model' with concrete data, but keep the counts. Never pad: each item must teach something different.",
+      "learning_objectives": 3,
+      "key_concepts": 4,
+      "real_life_analogies": 5,
+      "worked_examples": 3,
+      "incident_stories": 2,
+      "diagrams": 4,
+      "common_mistakes": 5,
+      "checklist_for_production": 6,
+      "quiz_questions": 6,
+      "cheat_sheet_points": "5 to 8",
+      "glossary_terms_referenced": 5,
+      "estimated_minutes": "15 to 35"
+    },
+
+    "examples_and_analogies_requirements": [
+      "Every lesson has at least 5 real-life analogies from everyday life (shop counter, restaurant order, bus ticket, queue at the bank, taxi meter, notebook ledger, piggy bank, shared family wallet, post office, community donation box, pharmacy prescription, and others), each mapped explicitly to the technical concept it explains. Each analogy has a 'tag' (a slug of the everyday thing). The 5 tags in one lesson are distinct, and the same tag appears in at most 3 lessons across the whole course, so analogies stay fresh.",
+      "Each analogy states where it breaks down (its limits), and the limit must be a real technical difference, not a platitude.",
+      "Every lesson has at least 3 worked numeric examples with realistic amounts and balances before and after, shown as ledger tables (see ledger_table_spec). Mix currencies (USD, EUR, EGP, SAR, AED and others). Where relevant include currencies with different minor units (for example JPY with 0 decimals and KWD with 3 decimals).",
+      "Every lesson has at least 2 short story scenarios of a realistic bank incident with a timestamped timeline (for example the customer who was charged twice because the network retried). Stories are fictional composites. Never name real banks or real incidents as fact, and never blame individuals. Each story states how it would have been detected.",
+      "Every wrong/right pair uses concrete data (real numbers, real rows, real requests), not abstract descriptions.",
+      "Use ONE consistent fictional bank (choose a name that matches no real bank and record it in DECISIONS.md) and a small recurring cast (customers, a merchant, an operations clerk, an auditor) across the whole course, so the capstone feels like one story.",
+      "Examples are culturally neutral or regionally familiar (Arab-world and international), and never offensive."
+    ],
+
+    "ledger_table_spec": {
+      "purpose": "Machine-checkable tables so every number in the course is verified.",
+      "balance_change_table": "{\"kind\": \"balance_change\", \"caption\": {en, ar}, \"rows\": [{\"account\": {en, ar}, \"currency\": \"EGP\", \"before_minor\": 150000, \"delta_minor\": -25000, \"after_minor\": 125000, \"note\": {en, ar} (optional)}]}",
+      "journal_table": "{\"kind\": \"journal\", \"caption\": {en, ar}, \"entries\": [{\"account\": {en, ar}, \"currency\": \"USD\", \"debit_minor\": 10000, \"credit_minor\": 0}]}",
+      "rules": [
+        "All amounts are integers in minor units. The renderer formats them using the currency exponent from the bundled ISO 4217 table and the learner's numeral setting.",
+        "The validator checks before + delta = after on every row, and that debits equal credits per currency in every journal table."
+      ]
+    },
+
+    "lesson_schema": {
+      "id": "string, stable slug from the curriculum map",
+      "module": "string, module id",
+      "title": { "en": "string", "ar": "string" },
+      "difficulty": "beginner | intermediate | advanced",
+      "prerequisites": ["lesson ids"],
+      "estimated_minutes": "number",
+      "content_reviewed_as_of": "YYYY-MM-DD from the system clock",
+      "learning_objectives": [{ "en": "string, starts with a verb", "ar": "string" }],
+      "plain_summary": { "en": "string", "ar": "string" },
+      "why_it_matters_in_banking": { "en": "string", "ar": "string" },
+      "key_concepts": [{ "term_id": "glossary id", "definition": { "en": "string", "ar": "string" } }],
+      "real_life_analogies": [
+        {
+          "tag": "slug of the everyday thing",
+          "analogy": { "en": "string", "ar": "string" },
+          "maps_to": { "en": "string", "ar": "string" },
+          "where_it_breaks": { "en": "string", "ar": "string" },
+          "diagram_id": "optional, required for at least one analogy per lesson"
+        }
+      ],
+      "worked_examples": [
+        {
+          "title": { "en": "string", "ar": "string" },
+          "steps": [{ "en": "string", "ar": "string" }],
+          "ledger_tables": ["balance_change_table or journal_table objects"],
+          "takeaway": { "en": "string", "ar": "string" }
+        }
+      ],
+      "incident_stories": [
+        {
+          "title": { "en": "string", "ar": "string" },
+          "timeline": [{ "t": "e.g. 09:00:01 or Day 2", "text": { "en": "string", "ar": "string" } }],
+          "root_cause": { "en": "string", "ar": "string" },
+          "how_it_was_detected": { "en": "string", "ar": "string" },
+          "fix": { "en": "string", "ar": "string" }
+        }
+      ],
+      "wrong_behavior": {
+        "scenario": { "en": "string", "ar": "string" },
+        "code_block": "code_block_spec (bad design, pseudo-code, SQL, or API example, with bilingual comments)",
+        "what_goes_wrong_step_by_step": [{ "en": "string", "ar": "string" }],
+        "real_world_consequences": [{ "en": "string", "ar": "string" }],
+        "diagram_id": "id of a diagram in this lesson"
+      },
+      "right_behavior": {
+        "correct_design": { "en": "string", "ar": "string" },
+        "code_block": "code_block_spec (good design, with bilingual comments)",
+        "why_it_works": [{ "en": "string", "ar": "string" }],
+        "trade_offs": [{ "en": "string", "ar": "string" }],
+        "diagram_id": "id of a diagram in this lesson"
+      },
+      "diagrams": ["diagram objects, see diagram_system"],
+      "jurisdiction_notes": [{ "en": "string, where practice varies by country, regulator, or scheme", "ar": "string" }],
+      "common_mistakes": [{ "en": "string", "ar": "string" }],
+      "checklist_for_production": [{ "en": "string", "ar": "string" }],
+      "glossary_terms": ["glossary ids"],
+      "quiz": [
+        {
+          "type": "single | scenario",
+          "question": { "en": "string", "ar": "string" },
+          "options": [{ "en": "string", "ar": "string" }],
+          "answer_index": "number",
+          "explanation": { "en": "string, also explains why the best distractor is wrong", "ar": "string" }
+        }
+      ],
+      "hands_on_exercise": {
+        "task": { "en": "string", "ar": "string" },
+        "runner": "sql | js | reading",
+        "starter": "code_block_spec",
+        "solution": "code_block_spec",
+        "tests": [{ "description": { "en": "string", "ar": "string" }, "expected": "string" }]
+      },
+      "cheat_sheet": [{ "en": "string, one line", "ar": "string" }],
+      "simulator_ids": ["simulator ids hosted by this lesson, if any"],
+      "next_lessons": ["lesson ids"]
+    },
+
+    "diagram_system": {
+      "diagram_object": "{\"id\": \"slug\", \"role\": \"analogy | wrong_vs_right | flow | state | er | architecture | timeline | ledger\", \"kind\": \"sequence | flowchart | state | er | architecture | timeline | custom_svg\", \"structure\": \"language-neutral Mermaid source where every visible label is a key written as @key, or a custom_svg component id\", \"labels\": {\"key\": {\"en\": \"...\", \"ar\": \"...\"}}, \"alt\": {\"en\": \"full text description\", \"ar\": \"...\"}, \"caption\": {\"en\": \"...\", \"ar\": \"...\"}, \"explanation\": {\"en\": \"...\", \"ar\": \"...\"}}",
+      "rules": [
+        "One structure plus translated labels per diagram guarantees the English and Arabic diagrams are structurally identical and halves the authoring effort. The build step substitutes labels per language, applies RTL transforms for Arabic (mirror flowchart direction, reverse sequence-diagram participant order, keep time flowing top to bottom), wraps mixed-script labels in bidi isolates, and pre-renders (or prepares) the SVG.",
+        "Run the RTL diagram spike in phase 0: render one sequence, one flowchart, one state, and one ER diagram with Arabic labels, mixed Arabic/Latin labels, and numbers. Keep the pipeline that renders all of them without reversed, clipped, or overlapping text, and use custom SVG components for any type that fails. Record the result and the screenshots in docs/DECISIONS.md.",
+        "Wrong-vs-right: the wrong and right diagrams render side by side (stacked on narrow screens). The wrong panel is red-accented with a ✗ icon and the label 'Wrong'. The right panel is green-accented with a ✓ icon and the label 'Right'. Color is never the only signal.",
+        "Keep node text short (about 8 words at most). Wide diagrams scroll inside their own container and open in a full-size zoom view. Each diagram has role=img, an accessible name, and a visible 'text description' toggle in the current language.",
+        "A diagram counts toward the quota only if it renders non-empty in both languages with no external references, and has alt text in both languages. At least one diagram per lesson has role 'wrong_vs_right' and at least one has role 'analogy'."
+      ]
+    },
+
+    "glossary_system": [
+      "Before writing any lesson, create the glossary term bank (at least 120 canonical terms) with one approved Arabic rendering each, a keep_latin flag, a definition in both languages, ar_aliases (alternative Arabic spellings and renderings, used for search), and related term ids. Extend it in the same commit as each lesson that introduces new terms. Reach at least 200 terms by the end.",
+      "Backlinks (term to lessons) are computed by the build. The glossary page shows each term with a side-by-side Arabic/English view and links to every lesson that uses it.",
+      "Two different term ids may not share the same Arabic rendering."
+    ],
+
+    "accuracy_rules": [
+      "Technical claims are accurate and conservative. Where practice varies by country, regulator, scheme, or bank, say so in jurisdiction_notes instead of presenting one version as universal.",
+      "Do not state specific regulatory thresholds, retention periods, scheme cut-off times, fee amounts, or legal requirements as fact. Present them as 'example only' or 'varies' unless you are certain, and then name the standard and edition.",
+      "Version-sensitive facts (for example the OWASP list edition, PCI DSS version, token or crypto recommendations) carry the edition or year, and the lesson shows its content_reviewed_as_of date.",
+      "Isolation-level and database behavior varies by engine. Say that simulators are simplified educational models.",
+      "Further reading names standards and books you are certain exist. No invented references and no URLs.",
+      "The About page and README (both languages) state: this is educational material, not legal, regulatory, or compliance advice, and the Arabic and English text was AI-authored and should be reviewed by a native Arabic-speaking banking engineer before being relied on."
+    ],
+
+    "writing_style": {
+      "english": "Typical sentence under 20 words. Active voice. Address the learner as 'you'. One idea per paragraph. No idioms. Define terms with {{term:id}} on first use.",
+      "arabic": "Simple Modern Standard Arabic. Natural syntax, no calques of English structure. Arabic punctuation (، ؛ ؟). Latin script for API, JWT, SQL, ACID, ISO 8583, and similar. No tashkeel except where it removes real ambiguity. Consistent terminology through the glossary only."
+    },
+
+    "quality_bar": [
+      "Every module is complete. No placeholder text, no TODO lessons, no lorem ipsum, no machine-translation artifacts.",
+      "Arabic and English are equivalent in meaning and depth, never a shortened Arabic version.",
+      "Every lesson includes the full lesson schema and meets every quota.",
+      "Code examples are language-neutral pseudo-code or SQL, with optional short snippets in TypeScript, Java, or Python.",
+      "Do not generate lessons from templates or loops that fill quotas with repeated or near-identical sentences. Each lesson is written individually."
+    ]
+  },
+
+  "simulators": {
+    "common_requirements": [
+      "Each simulator has a pure TypeScript engine (deterministic, seeded RNG, no UI code) with unit tests and fast-check property tests that assert its invariants, and a separate UI layer.",
+      "Fully bilingual. Controls: step, back, play/pause, speed, reset, scenario presets. A narration panel (aria-live) explains each step in plain language. Every step shows state as a ledger table or timeline. Keyboard operable, respects prefers-reduced-motion, usable at 375 px width in LTR and RTL.",
+      "Each is embedded in its host lesson (simulator_hosts) and also listed in a Simulators gallery page.",
+      "Each states in both languages that it is a simplified educational model and that real systems vary."
+    ],
+    "list": [
+      { "id": "double-spend-race", "must_show": "Two concurrent withdrawals against one balance with step-through interleavings. Modes: naive read-modify-write (lost update or overdraft), atomic conditional UPDATE, pessimistic lock, optimistic version check. Invariant: in the safe modes the balance never goes below zero and no update is lost." },
+      { "id": "idempotency-retry", "must_show": "A client sends a transfer, the response is lost, the client retries. Modes: no key (double charge), key with unique constraint, same key with a different payload (conflict), key expiry. Shows the server's idempotency table. Invariant: one logical request has at most one effect." },
+      { "id": "ledger-playground", "must_show": "Create accounts, post journal entries in several currencies, reject unbalanced entries, show a trial balance, and fix a mistake with a reversal entry instead of a delete. Invariant: total debits equal total credits per currency." },
+      { "id": "isolation-levels", "must_show": "Two transactions on a timeline. Levels: read uncommitted, read committed, repeatable read, serializable. Anomalies: dirty read, non-repeatable read, phantom, lost update, write skew. Shows which anomalies each level allows in the standard model, with a note that engines differ." },
+      { "id": "card-lifecycle", "must_show": "Authorize, capture, clearing, settlement, plus reversal, refund, and chargeback. Shows the parties (cardholder, merchant, acquirer, card network, issuer) and the available vs posted balance after each step, including hold expiry." },
+      { "id": "saga-stepper", "must_show": "A multi-step transfer flow with compensations. Failure injection at any step, compensations running in reverse order, the pivot step, and an orchestration vs choreography toggle." }
+    ]
+  },
+
+  "validation_suite": {
+    "command": "npm run validate:content (supports -- --lesson <id>). It writes reports/content-report.json and a per-module table, and exits non-zero on any error.",
+    "checks": [
+      "JSON Schema validity (ajv) for lessons, glossary, and curriculum.",
+      "Parity: every {en, ar} field exists and is non-empty in both languages. UI string files en.json and ar.json have identical key sets, including all Arabic plural forms for count strings.",
+      "The ar text contains Arabic letters and its Arabic-letter share is at least 50% of its letters after excluding code, {{tokens}}, and parenthesized English terms. The en text contains no Arabic letters. ar is never equal to or near-identical to en (similarity check), except for code and keep_latin proper terms.",
+      "Truncation guard: character-length ratio ar/en per field stays within a sane band (warn outside 0.5 to 1.6, fail outside 0.35 to 2.5).",
+      "Number consistency: every amount, percentage, and currency code in the en text appears in the ar text after normalizing Arabic-Indic digits to Western digits.",
+      "Quotas from lesson_quotas, including distinct analogy tags in a lesson, the cap of 3 uses per tag across the course, at least one wrong_vs_right diagram and one analogy diagram, and a diagram with alt text in both languages.",
+      "Ledger tables: before + delta = after; debits equal credits per currency; amounts are integers; the currency exponent matches the bundled ISO 4217 table.",
+      "Diagrams: label keys exist in both languages, structure parses, and both language versions render non-empty SVG with no external URLs or images.",
+      "Glossary: every referenced id exists, every term has both languages and a definition, no duplicate Arabic renderings, and {{term:id}} and {{lesson:id}} tokens all resolve.",
+      "Curriculum graph: ids are unique and match files, prerequisites and next_lessons exist, the graph is acyclic, and all 82 lessons are present at final validation.",
+      "Quiz: answer_index in range, at least 3 distinct options, explanation present, at least 2 scenario questions per lesson, and no single answer position used by more than half the questions in a lesson. The UI shuffles options at runtime.",
+      "Padding and duplication detector: flags near-duplicate sentences across lessons and an analogy reused beyond the tag cap.",
+      "Forbidden content: http(s) URLs in content, HTML tags, 'lorem', 'TODO', 'TBD', 'placeholder', and unresolved tokens.",
+      "Code blocks use allowed languages, and each commented line has both comment languages."
+    ]
+  },
+
+  "app_features": [
+    "Home dashboard with overall progress, current module, estimated time remaining, and a roadmap view.",
+    "Language toggle (العربية / English) in the header with instant RTL/LTR switching.",
+    "Sidebar navigation by module and lesson with completion checkmarks. The sidebar flips side in RTL and becomes a drawer on mobile.",
+    "Lesson page with tabs: Explain, Analogies & Examples, Wrong vs Right, Diagrams, Quiz, Exercise. Learning objectives at the top, cheat-sheet points at the end.",
+    "Interactive simulators embedded in their lessons plus a Simulators gallery.",
+    "Global offline full-text search in both languages with highlighted results and cross-language glossary matching.",
+    "Bilingual glossary page where every term links back to its lessons, with a side-by-side Arabic/English view.",
+    "Bookmarks, notes per lesson (stored locally), and a Continue learning button.",
+    "Review mode: a spaced-repetition queue (simple Leitner boxes) built from the quizzes of completed lessons, stored locally.",
+    "Settings: language, theme (light, dark, system), numerals (Western or Arabic-Indic), text size, reduce-motion override, learner-data export/import/reset, and storage usage with persistence status.",
+    "Printable bilingual cheat sheets per module, generated from the cheat_sheet fields.",
+    "Visible offline-status indicator and an About/Build page showing app version, git hash, build date, content and schema versions, lesson/term/diagram counts, third-party licenses, and the educational disclaimer."
+  ],
+
+  "accessibility": [
+    "Target WCAG 2.2 AA in both languages and both themes. Run axe (Playwright) on home, a lesson page, glossary, search, settings, and every simulator in en/ar and light/dark.",
+    "Everything is keyboard operable with visible focus and no focus traps. Focus moves sensibly on route and language change. Touch targets are at least 44 px.",
+    "Diagrams have text descriptions, simulators announce steps via aria-live, and color is never the only signal (use icons and text such as ✗ / ✓).",
+    "Respect prefers-reduced-motion and prefers-color-scheme. Text can be enlarged to 200% without loss of content."
+  ],
+
+  "testing_and_quality_gates": {
+    "automated": [
+      "Unit tests: schema validator, parity checks, Arabic normalization, search, numeral and money formatting (0, 2, and 3 decimal currencies), progress storage, and every simulator engine (including property tests for invariants).",
+      "Component tests: lesson renderer, wrong-vs-right panel, quiz, language toggle, and RTL mirroring of directional icons.",
+      "Search fixtures: at least 30 queries covering Arabic with and without diacritics, alef variants, ال-prefixed words, English terms finding Arabic lessons, and the reverse.",
+      "smoke:lesson <id>: in en and ar at 375 px and 1280 px, assert no console errors, no horizontal page overflow, all diagrams render with no clipped text, and zero non-local requests. Run it for the lessons touched by each commit, and for all lessons at module gates and at the end.",
+      "Print check: generate each module cheat sheet to PDF with Playwright in both languages and assert it is non-empty and has the right dir.",
+      "Add an RTL layout smoke check on Firefox and WebKit if those browsers are installable."
+    ],
+    "commit_gates": [
+      "Every commit: npm run check (typecheck, lint, lint:rtl, validate:content scoped to changed lessons, unit tests for changed code).",
+      "Any commit that changes src, build config, the service worker, or content schemas: also npm run build and verify:offline.",
+      "Module completion and every tag: full npm run build, verify:offline, npm test, test:e2e:offline, and smoke:lesson for all lessons in the module."
+    ]
+  },
+
+  "git_workflow": {
+    "rules": [
+      "Initialize a git repository at the start (git init) if one does not exist, and use a main branch.",
+      "COMMIT AFTER EVERY SINGLE STEP. One logical change per commit. Never batch many steps into one commit.",
+      "Use Conventional Commits: feat:, fix:, docs:, chore:, test:, refactor:, content:, i18n:.",
+      "Each commit message has a clear subject plus a body listing what was done and what remains next, and ends with a trailer 'Task-Id: T-xxx'.",
+      "Run the commit_gates above before each commit. Do not commit a broken state.",
+      "Commit content per lesson with both languages together (and its glossary additions and diagrams), never English first and Arabic later, so the repo never contains half-translated lessons.",
+      "A commit cannot contain its own hash. Therefore update PROGRESS.json and PROGRESS.md in the same commit as the work (status done), and let 'npm run progress:sync' fill each task's commit hash and recompute overall_percent from git history using the Task-Id trailers. Run it at the start of the next task and commit the result with that task. last_commit may lag by one commit, and HANDOFF.md says so.",
+      "Create annotated tags at milestones: v0.1-scaffold, v0.2-offline-shell, v0.3-content-engine, v0.4-golden-lesson, then v0.5-module-01 through v0.16-module-12 (v0.(4+N)-module-NN), v0.17-polish, v1.0-complete."
+    ],
+    "commit_message_template": "type(scope): short summary\n\nDone: <what was completed>\nVerified: <command(s) run and result>\nNext: <the exact next task id from PROGRESS.json>\n\nTask-Id: T-xxx"
+  },
+
+  "progress_tracking": {
+    "purpose": "Another agent (or the owner) must be able to pick up the project at any moment, see exactly what is finished and what is not, and continue without asking anything.",
+    "files": [
+      {
+        "path": "PROGRESS.json",
+        "schema": {
+          "project": "string",
+          "last_updated": "ISO timestamp",
+          "last_commit": "short hash (may lag by one commit)",
+          "overall_percent": "number, computed by progress:sync, never hand-typed",
+          "next_action": "task id plus one-sentence instruction",
+          "tasks": [
+            {
+              "id": "T-001",
+              "title": "string",
+              "phase": "string",
+              "status": "todo | in_progress | done | blocked",
+              "commit": "hash or null, filled by progress:sync",
+              "verification": "the exact command(s) run and the result",
+              "blocked_reason": "string or null",
+              "notes": "string"
+            }
+          ],
+          "modules": [
+            {
+              "id": "01",
+              "title": { "en": "string", "ar": "string" },
+              "lessons_total": "number",
+              "lessons_published": "number, computed from curriculum.json and validate:content",
+              "status": "todo | in_progress | done"
+            }
+          ]
+        }
+      },
+      { "path": "PROGRESS.md", "content": "Human-readable checklist generated from PROGRESS.json by progress:sync, with done and remaining items." },
+      { "path": "HANDOFF.md", "content": "Instructions for a new agent: project overview, how to run, how to continue, conventions, the current next_action, the per-lesson workflow, the known issues, and the note that commit hashes can lag by one commit." },
+      { "path": "docs/DECISIONS.md", "content": "Every autonomous decision with a short reason, including framework, fonts, diagram pipeline, file:// choice, and the fictional bank name." },
+      { "path": "docs/SPEC.json", "content": "Verbatim copy of this prompt." },
+      { "path": "docs/ENVIRONMENT.md", "content": "Preflight results." },
+      { "path": "docs/AUTHORING_GUIDE.md", "content": "Style rules, the lesson skeleton, the code_block, diagram, and ledger table formats, the glossary workflow, and a pointer to the golden lesson." }
+    ],
+    "update_rule": "Set the task to in_progress at its start and done at its end in the same commit as the work. A task is never marked done without verification."
+  },
+
+  "per_lesson_workflow": [
+    "1. At the start of a session, re-read HANDOFF.md, PROGRESS.json, AUTHORING_GUIDE.md, the golden lesson, and reports/analogy-index.json (generated by the validator, lists used analogy tags). Do not reread all prior lessons.",
+    "2. Add or extend glossary terms (both languages) first.",
+    "3. Write the lesson JSON with English and Arabic together in one pass, including its diagrams, code blocks, and ledger tables.",
+    "4. Run validate:content for the lesson and fix everything.",
+    "5. Run smoke:lesson for the lesson and fix everything.",
+    "6. Self-review: accuracy and conservatism of claims, numbers, real analogy limits, concrete wrong/right data, natural Arabic, consistent terminology, no filler.",
+    "7. Mark the lesson published in curriculum.json, update PROGRESS, and commit with both languages together."
+  ],
+
+  "per_module_gate": [
+    "All lessons in the module are published, validated, and smoke-tested.",
+    "Re-read all Arabic strings of the module once as a native editor. Write docs/reviews/module-NN.md listing the issues found and fixed (unnatural phrasing, terminology drift, bidi problems).",
+    "Generate and print-check the module cheat sheet in both languages.",
+    "Run the full gate (build, verify:offline, test, test:e2e:offline), then create the annotated tag."
+  ],
+
+  "scale_and_context_management": [
+    "The course has 82 lessons, each written in two languages. Treat it as a long project: write one lesson at a time and commit each one.",
+    "Use the golden lesson as the style anchor. Do not re-read the whole repo. Use the generated indexes (analogy tags, glossary bank) to avoid repetition.",
+    "Never leave main broken. If time or context runs out, the last commit must still be a coherent release in which every published lesson is complete, the remaining lessons are 'planned' and hidden, and PROGRESS.json and HANDOFF.md state exactly what is next.",
+    "Do not lower quotas or skip validation to go faster. If something must be cut, cut in this order and record it: runnable SQL/JS exercises (fall back to reading mode), Firefox/WebKit smoke checks, build:file. Never cut verify:offline, the parity check, or the offline e2e test."
+  ],
+
+  "build_phases": [
+    { "phase": 0, "name": "Preflight and spikes", "tasks": ["Environment preflight and docs/ENVIRONMENT.md", "Save SPEC.json", "RTL diagram spike (sequence, flowchart, state, ER with Arabic and mixed-script labels) and pipeline decision", "Pick fonts and verify Arabic shaping and bidi rendering", "Decide file:// option"] },
+    { "phase": 1, "name": "Scaffold", "tasks": ["Init repo", "Choose and install the stack with exact versions", "Create the project structure and npm scripts (check, lint:rtl, and so on)", "Create PROGRESS.json, PROGRESS.md, HANDOFF.md, DECISIONS.md, AUTHORING_GUIDE.md and the progress:sync script", "First commit and tag v0.1-scaffold"] },
+    { "phase": 2, "name": "Bilingual and offline shell", "tasks": ["i18n setup, language toggle, and persisted language", "RTL/LTR layout with logical properties and lint:rtl", "Self-hosted Arabic, Latin, and monospace fonts", "Routing, theming, settings, and numeral formatting", "PWA manifest, service worker, update prompt, and offline indicator", "verify:offline script and CSP", "Bilingual search with Arabic normalization and tests", "Playwright offline e2e skeleton running against the shell", "Tag v0.2-offline-shell"] },
+    { "phase": 3, "name": "Content engine", "tasks": ["JSON Schemas for lessons, glossary, and curriculum", "validate:content with every check in validation_suite", "Lesson renderer with safe inline markup, term tokens, and code_block renderer", "Diagram pipeline (build-time, RTL-safe) and diagram component", "Analogy, worked-example (ledger tables), incident-story, and wrong-vs-right components", "Quiz component and review mode", "Progress, notes, bookmarks storage with export/import", "Glossary page and glossary term bank (at least 120 terms)", "smoke:lesson script", "Tag v0.3-content-engine"] },
+    { "phase": 4, "name": "Golden lesson vertical slice", "tasks": ["Author 03-double-entry-bookkeeping completely to every quota, with the ledger-playground simulator embedded", "Prove it end to end: validate:content, smoke:lesson, axe, test:e2e:offline in both languages, and print cheat sheet", "Write AUTHORING_GUIDE.md from the lessons learned", "Tag v0.4-golden-lesson"] },
+    { "phase": 5, "name": "Content, module by module", "tasks": ["Follow per_lesson_workflow for every lesson in curriculum order, one commit per lesson", "Build each simulator in the module that hosts it (ledger-playground in 03, double-spend-race, idempotency-retry, and isolation-levels in 04, saga-stepper in 05, card-lifecycle in 06) with engine tests, UI, and embedding", "Run per_module_gate at the end of each module and tag v0.(4+N)-module-NN", "Update PROGRESS after every commit"] },
+    { "phase": 6, "name": "Polish, packaging, verification", "tasks": ["Simulators gallery page", "Accessibility pass (axe on all page types in both languages and themes)", "Mobile layout pass in RTL and LTR for every page type", "Print cheat sheets for all modules", "Build info and About page, third-party licenses", "package:offline zip, SHA256SUMS, bilingual README-OFFLINE, and the unzip-and-serve test", "vendor:deps and a documented offline rebuild test", "Full test:e2e:offline over all lessons and simulators in both languages", "Final README and HANDOFF", "Tag v0.17-polish, then v1.0-complete"] }
+  ],
+
+  "definition_of_done": [
+    "npm ci && npm run build succeeds with no errors or warnings that matter.",
+    "validate:content passes for all 82 lessons, including full Arabic/English parity, and every quota in lesson_quotas.",
+    "lint:rtl, typecheck, lint, and npm test pass.",
+    "verify:offline passes with zero external network references in the build output and a complete precache manifest.",
+    "test:e2e:offline passes: with the network disabled, every route, every lesson, every diagram, all six simulators, search, and the language toggle work in both languages, with zero non-local requests. The same smoke suite passes against the unzipped release served by serve.mjs.",
+    "axe reports no serious or critical violations on the covered pages in en/ar and light/dark.",
+    "All 12 modules are complete in both languages with the counts reported by reports/content-report.json (lessons, analogies, worked examples, stories, diagrams, quiz questions, glossary terms).",
+    "release/bank-academy-offline.zip exists, matches SHA256SUMS, and runs by following README-OFFLINE.",
+    "PROGRESS.json shows 100% with every task done and a commit hash for each.",
+    "README, README-OFFLINE, and HANDOFF.md are accurate and bilingual where user-facing, and the About page carries the educational disclaimer.",
+    "Git history shows small, meaningful commits with Task-Id trailers and an annotated tag at each milestone."
+  ],
+
+  "final_response_format": {
+    "deliver": "Short final report only: what was built, the chosen stack and key decisions, how to run it online once and then offline, the repo structure, the tag list, a compact table of verification results (command and result) with the final content counts, and anything intentionally left out or blocked (with reasons).",
+    "do_not": "Do not ask follow-up questions and do not end with a list of options."
+  }
+}

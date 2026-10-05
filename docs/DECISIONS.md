@@ -1,0 +1,18 @@
+# Autonomous Decisions Log
+
+Every autonomous decision, with a short reason, per SPEC.
+
+| Id | Date | Decision | Reason |
+|---|---|---|---|
+| D-001 | 2026-10-05 | Framework: React 19 + TypeScript (strict) + Vite, React Router HashRouter | Spec-recommended stack; most mature; HashRouter works from any plain static server and serve.mjs |
+| D-002 | 2026-10-05 | Fictional bank name: **Numuw Bank** (بنك نُمو) | Google search returns zero results for "Numuw Bank"; matches no real bank. First candidate "Qurtas Bank" was rejected because Al-Qurtas Bank (Iraq) exists |
+| D-003 | 2026-10-05 | Diagram pipeline: hand-written inline SVG React components | Build-time mermaid-cli pre-render needs a Chromium download; sandbox Chromium availability is uncertain and the spec explicitly allows custom SVG for any diagram type that fails the spike. Custom SVG gives full control of RTL transforms, bidi isolates, and guaranteed identical EN/AR structure. Mermaid runtime NOT shipped, so budget and offline guarantees hold |
+| D-004 | 2026-10-05 | Arabic font: IBM Plex Sans Arabic (self-hosted woff2 subsets); Latin: Inter; Mono: JetBrains Mono | Long-text readability, OFL license, good Arabic shaping. IBM Plex Sans Arabic has clear naskh-style open counters that read well at body sizes; Cairo is more display-oriented |
+| D-005 | 2026-10-05 | file:// option (b): do NOT claim index.html works; serve.mjs is required | Option (a) build:file adds a second build target and IIFE bundle that duplicates testing surface; the packaged zip ships serve.mjs which is a one-command run on all OSes. README-OFFLINE states this plainly |
+| D-006 | 2026-10-05 | Runnable exercises: SQL via sql.js (WASM bundled locally) + JS via sandboxed Web Worker, where time allows; lessons authored with runner "reading" fallback where not | Spec marks runnable as optional; cut order in scale_and_context_management puts it first |
+| D-007 | 2026-10-05 | Search: FlexSearch, one index per language, built at build time | Mature, small, works offline from bundled JSON indexes |
+| D-008 | 2026-10-05 | State/storage: Zustand for UI; idb-keyval wrapper with localStorage fallback; navigator.storage.persist() called; JSON export/import/reset in Settings | Per spec tech_decisions |
+| D-009 | 2026-10-05 | Scope truth: this session delivers phases 0-4 (preflight, scaffold, offline shell, content engine, golden lesson 03 + ledger-playground simulator) as a coherent release. The 82-lesson full course is tracked lesson-by-lesson in PROGRESS.json with status 'planned' and hidden from navigation | SPEC execution_mode rule 1: work continuously; rule: never leave main broken; scale_and_context_management: remaining lessons stay 'planned' and hidden, PROGRESS states exactly what is next. Writing 82 quota-complete bilingual lessons cannot fit one session; every published lesson is complete in both languages |
+| D-010 | 2026-10-05 | Code highlighting: Prism (bundled, only needed grammars) over Shiki | Smaller build-time surface, mature, permissive MIT; Shiki regex-engine version pinning heavier for same result here. Grammars: SQL, TypeScript, Java, Python, JSON, pseudo (rendered as plain text) |
+| D-011 | 2026-10-05 | UI components: hand-rolled accessible primitives (dialog, tabs, disclosure) instead of pulling Radix | Fewer deps to vendor for offline; spec allows either, but full Radix copy adds surface without need for the small set of primitives used. WCAG 2.2 AA patterns followed |
+| D-012 | 2026-10-05 | Content review date (content_reviewed_as_of) = 2026-10-05 from system clock, every lesson | Spec rule: use system clock, never guess |
