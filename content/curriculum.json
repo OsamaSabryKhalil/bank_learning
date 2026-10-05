@@ -1,0 +1,777 @@
+{
+  "version": "0.1.0",
+  "simulator_hosts": {
+    "ledger-playground": "03-double-entry-bookkeeping",
+    "isolation-levels": "04-isolation-levels-anomalies",
+    "double-spend-race": "04-race-conditions-double-spend",
+    "idempotency-retry": "04-idempotency-keys",
+    "saga-stepper": "05-sagas-compensation",
+    "card-lifecycle": "06-card-payment-lifecycle"
+  },
+  "modules": [
+    {
+      "id": "01",
+      "title": {
+        "en": "Banking Domain Foundations",
+        "ar": "أساسيات المجال المصرفي"
+      },
+      "lessons": [
+        {
+          "id": "01-how-banks-work",
+          "title": {
+            "en": "How banks work",
+            "ar": "كيف تعمل البنوك"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "01-accounts-customers-products",
+          "title": {
+            "en": "Accounts, customers, products",
+            "ar": "الحسابات والعملاء والمنتجات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "01-account-lifecycle-states",
+          "title": {
+            "en": "Account lifecycle and states: pending, active, dormant, frozen, closed",
+            "ar": "دورة حياة الحساب وحالاته: قيد الانتظار، نشط، خامل، مجمّد، مغلق"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "01-core-vs-digital-layers",
+          "title": {
+            "en": "Core banking vs digital banking layers",
+            "ar": "الطبقة الأساسية للبنوك مقابل الطبقات الرقمية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "01-ledger-vs-balance",
+          "title": {
+            "en": "Ledger vs account balance",
+            "ar": "دفتر الأستاذ مقابل رصيد الحساب"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "01-banking-vocabulary",
+          "title": {
+            "en": "Banking vocabulary tour",
+            "ar": "جولة في المفردات المصرفية"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": {
+        "en": "Money and Data Correctness",
+        "ar": "صحة الأموال والبيانات"
+      },
+      "lessons": [
+        {
+          "id": "02-never-float-for-money",
+          "title": {
+            "en": "Never use floating point for money",
+            "ar": "لا تستخدم أبدًا الفاصلة العائمة للنقود"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "02-minor-units-vs-decimal",
+          "title": {
+            "en": "Integers in minor units vs decimal types",
+            "ar": "الأعداد الصحيحة بالوحدات الصغرى مقابل الأنواع العشرية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "02-currencies-minor-units-rounding",
+          "title": {
+            "en": "Currencies, minor units, and rounding rules",
+            "ar": "العملات والوحدات الصغرى وقواعد التقريب"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "02-multi-currency-fx",
+          "title": {
+            "en": "Multi-currency accounts and FX conversion",
+            "ar": "الحسابات متعددة العملات وتحويل العملات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "02-time-timezones-business-days",
+          "title": {
+            "en": "Time, timezones, and business days",
+            "ar": "الوقت والمناطق الزمنية وأيام العمل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "02-immutable-records-reversals",
+          "title": {
+            "en": "Immutable records: reversals instead of deletes",
+            "ar": "سجلات غير قابلة للتغيير: القيود العكسية بدلًا من الحذف"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": {
+        "en": "Ledger and Accounting",
+        "ar": "دفتر الأستاذ والمحاسبة"
+      },
+      "lessons": [
+        {
+          "id": "03-double-entry-bookkeeping",
+          "title": {
+            "en": "Double-entry bookkeeping",
+            "ar": "القيد المزدوج"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "03-chart-of-accounts",
+          "title": {
+            "en": "Chart of accounts",
+            "ar": "دليل الحسابات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "03-journal-entries-postings",
+          "title": {
+            "en": "Journal entries and postings",
+            "ar": "قيود اليومية والترحيل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "03-pending-posted-available-balance",
+          "title": {
+            "en": "Pending vs posted vs available balance",
+            "ar": "الرصيد المعلق مقابل المرحّل مقابل المتاح"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "03-holds-authorizations",
+          "title": {
+            "en": "Holds and authorizations",
+            "ar": "الحجوزات والتصاريح"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "03-interest-fees-eod-batch",
+          "title": {
+            "en": "Interest, fees, and end-of-day batch jobs",
+            "ar": "الفوائد والرسوم ووظائف نهاية اليوم"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "03-reconciliation-settlement",
+          "title": {
+            "en": "Reconciliation and settlement",
+            "ar": "المطابقة والتسوية"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": {
+        "en": "Transactions and Concurrency",
+        "ar": "المعاملات والتزامن"
+      },
+      "lessons": [
+        {
+          "id": "04-acid-in-depth",
+          "title": {
+            "en": "ACID in depth",
+            "ar": "ACID بعمق"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-isolation-levels-anomalies",
+          "title": {
+            "en": "Isolation levels and anomalies",
+            "ar": "مستويات العزل والشذوذات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-race-conditions-double-spend",
+          "title": {
+            "en": "Race conditions and double-spend",
+            "ar": "حالات التسابق والإنفاق المزدوج"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-pessimistic-vs-optimistic-locking",
+          "title": {
+            "en": "Pessimistic vs optimistic locking",
+            "ar": "القفل المتشائم مقابل المتفائل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-deadlocks",
+          "title": {
+            "en": "Deadlocks",
+            "ar": "حالات التوقف التام"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-idempotency-keys",
+          "title": {
+            "en": "Idempotency keys",
+            "ar": "مفاتيح الاندماج (Idempotency)"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-exactly-once-myth",
+          "title": {
+            "en": "Exactly-once myth vs at-least-once plus idempotency",
+            "ar": "خرافة «مرة واحدة بالضبط» مقابل «مرة على الأقل» مع الاندماج"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "04-retries-backoff-jitter-timeouts",
+          "title": {
+            "en": "Retries, backoff, jitter, timeouts",
+            "ar": "إعادة المحاولة والتراجع والعشوائية والمهلات"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "title": {
+        "en": "Distributed Systems for Banking",
+        "ar": "الأنظمة الموزعة للبنوك"
+      },
+      "lessons": [
+        {
+          "id": "05-cap-consistency-models",
+          "title": {
+            "en": "CAP and consistency models",
+            "ar": "CAP ونماذج الاتساق"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-sagas-compensation",
+          "title": {
+            "en": "Sagas and compensating transactions",
+            "ar": "الساغا والمعاملات التعويضية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-two-phase-commit",
+          "title": {
+            "en": "Two-phase commit and why it is avoided",
+            "ar": "الالتزام ثنائي الطور ولماذا يُتجنَّب"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-outbox-pattern",
+          "title": {
+            "en": "Outbox pattern",
+            "ar": "نمط صندوق الصادر (Outbox)"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-event-sourcing-cqrs",
+          "title": {
+            "en": "Event sourcing and CQRS",
+            "ar": "مصدر الأحداث وCQRS"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-queues-dlq-ordering",
+          "title": {
+            "en": "Message queues, dead letter queues, ordering",
+            "ar": "قوائم الرسائل والقوائم الميتة والترتيب"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-circuit-breakers-bulkheads",
+          "title": {
+            "en": "Circuit breakers and bulkheads",
+            "ar": "قواطع الدائرة والحواجز العازلة"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "05-monolith-vs-microservices",
+          "title": {
+            "en": "Monolith vs microservices for banks",
+            "ar": "النظام الموحّد مقابل الخدمات المصغرة للبنوك"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "title": {
+        "en": "Payments and Interbank Systems",
+        "ar": "المدفوعات والأنظمة بين البنوك"
+      },
+      "lessons": [
+        {
+          "id": "06-card-payment-lifecycle",
+          "title": {
+            "en": "Card payment lifecycle",
+            "ar": "دورة حياة مدفوعات البطاقات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "06-payment-schemes-overview",
+          "title": {
+            "en": "ACH, SEPA, wire, SWIFT, instant payments",
+            "ar": "أنظمة الدفع: ACH وSEPA والتحويلات وSWIFT والمدفوعات الفورية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "06-iso8583-iso20022",
+          "title": {
+            "en": "ISO 8583 and ISO 20022 overview",
+            "ar": "نظرة على ISO 8583 وISO 20022"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "06-payment-state-machines",
+          "title": {
+            "en": "Payment state machines",
+            "ar": "آلات حالات المدفوعات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "06-reversals-refunds-chargebacks",
+          "title": {
+            "en": "Reversals, refunds, and chargebacks",
+            "ar": "القيود العكسية والاسترداد والاعتراضات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "06-reconciliation-files-cutoffs",
+          "title": {
+            "en": "Reconciliation files and cut-off times",
+            "ar": "ملفات المطابقة وأوقات القطع"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "title": {
+        "en": "Security",
+        "ar": "الأمان"
+      },
+      "lessons": [
+        {
+          "id": "07-authentication",
+          "title": {
+            "en": "Authentication: passwords, MFA, sessions, JWT, OAuth2/OIDC",
+            "ar": "المصادقة: كلمات المرور وMFA والجلسات وJWT وOAuth2/OIDC"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-open-banking-consent",
+          "title": {
+            "en": "Third-party access and consent (open banking style)",
+            "ar": "وصول الأطراف الثالثة والموافقة (الخدمات المصرفية المفتوحة)"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-authorization-maker-checker",
+          "title": {
+            "en": "Authorization: RBAC, ABAC, least privilege, maker-checker",
+            "ar": "التصريح: RBAC وABAC وأقل صلاحية ومبدأ الأربع عيون"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-encryption-transit-rest",
+          "title": {
+            "en": "Encryption in transit and at rest",
+            "ar": "التشفير أثناء النقل وفي السكون"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-keys-hsm-tokenization",
+          "title": {
+            "en": "Key management, HSMs, tokenization",
+            "ar": "إدارة المفاتيح ووحدات HSM والترميز البديل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-secrets-management",
+          "title": {
+            "en": "Secrets management",
+            "ar": "إدارة الأسرار"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-owasp-api-top-10",
+          "title": {
+            "en": "OWASP API Top 10 for banking",
+            "ar": "قائمة OWASP API العشرة للبنوك"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-pci-dss-basics",
+          "title": {
+            "en": "PCI DSS basics",
+            "ar": "أساسيات PCI DSS"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-audit-logging-tamper-evidence",
+          "title": {
+            "en": "Audit logging and tamper evidence",
+            "ar": "سجلات التدقيق وإثبات عدم العبث"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "07-insider-threat-controls",
+          "title": {
+            "en": "Insider threat controls",
+            "ar": "ضوابط التهديد الداخلي"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "title": {
+        "en": "Compliance and Risk",
+        "ar": "الامتثال وإدارة المخاطر"
+      },
+      "lessons": [
+        {
+          "id": "08-kyc-onboarding",
+          "title": {
+            "en": "KYC and onboarding",
+            "ar": "اعرف عميلك (KYC) والانضمام"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "08-aml-sanctions-screening",
+          "title": {
+            "en": "AML monitoring and sanctions screening",
+            "ar": "مراقبة غسل الأموال وفحص العقوبات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "08-fraud-detection-basics",
+          "title": {
+            "en": "Fraud detection basics",
+            "ar": "أساسيات كشف الاحتيال"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "08-privacy-retention-erasure",
+          "title": {
+            "en": "Data privacy, retention, right to erasure vs legal retention",
+            "ar": "خصوصية البيانات والاستبقاء والحق في المحو مقابل الاستبقاء القانوني"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "08-regulatory-reporting-audit-trails",
+          "title": {
+            "en": "Regulatory reporting and audit trails",
+            "ar": "التقارير التنظيمية ومسارات التدقيق"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "title": {
+        "en": "API and Database Design",
+        "ar": "تصميم الواجهات وقواعد البيانات"
+      },
+      "lessons": [
+        {
+          "id": "09-rest-api-financial-operations",
+          "title": {
+            "en": "REST API design for financial operations",
+            "ar": "تصميم REST للعمليات المالية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-versioning-compatibility",
+          "title": {
+            "en": "Versioning and backward compatibility",
+            "ar": "الإصدارات والتوافق الرجعي"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-pagination-filtering-rate-limiting",
+          "title": {
+            "en": "Pagination, filtering, rate limiting",
+            "ar": "التقسيم إلى صفحات والتصفية وتحديد المعدل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-error-handling-codes",
+          "title": {
+            "en": "Error handling and error codes",
+            "ar": "معالجة الأخطاء ورموزها"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-ledger-schema-design",
+          "title": {
+            "en": "Schema design for ledgers",
+            "ar": "تصميم مخطط دفاتر الأستاذ"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-indexing-query-performance",
+          "title": {
+            "en": "Indexing and query performance",
+            "ar": "الفهرسة وأداء الاستعلامات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-zero-downtime-migrations",
+          "title": {
+            "en": "Migrations with zero downtime",
+            "ar": "الترحيلات دون توقف"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-replication-sharding-partitioning",
+          "title": {
+            "en": "Replication, sharding, partitioning",
+            "ar": "النسخ والتجزئة والتقسيم"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "09-caching-never-cache",
+          "title": {
+            "en": "Caching: what must never be cached",
+            "ar": "التخزين المؤقت: ما لا يُخزَّن أبدًا"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "title": {
+        "en": "Reliability and Operations",
+        "ar": "الموثوقية والتشغيل"
+      },
+      "lessons": [
+        {
+          "id": "10-ha-dr-rpo-rto",
+          "title": {
+            "en": "High availability and disaster recovery (RPO/RTO)",
+            "ar": "التوافر العالي والتعافي من الكوارث (RPO/RTO)"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "10-backups-restore-drills",
+          "title": {
+            "en": "Backups and restore drills",
+            "ar": "النسخ الاحتياطية وتدريبات الاستعادة"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "10-observability",
+          "title": {
+            "en": "Observability: logs, metrics, traces",
+            "ar": "الملاحظة: السجلات والمقاييس والتتبعات"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "10-alerting-incident-response",
+          "title": {
+            "en": "Alerting and incident response",
+            "ar": "التنبيهات والاستجابة للحوادث"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "10-feature-flags-safe-rollouts",
+          "title": {
+            "en": "Feature flags and safe rollouts",
+            "ar": "أعلام الميزات والإطلاق الآمن"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "10-capacity-planning-peaks",
+          "title": {
+            "en": "Capacity planning and peak loads",
+            "ar": "تخطيط السعة وأحمال الذروة"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "10-chaos-testing",
+          "title": {
+            "en": "Chaos testing",
+            "ar": "اختبار الفوضى"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "title": {
+        "en": "Testing and Quality",
+        "ar": "الاختبار والجودة"
+      },
+      "lessons": [
+        {
+          "id": "11-test-types",
+          "title": {
+            "en": "Unit, integration, contract, and end-to-end tests",
+            "ar": "اختبارات الوحدة والتكامل والعقود والنهاية إلى النهاية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "11-property-based-testing-ledgers",
+          "title": {
+            "en": "Property-based testing for ledgers",
+            "ar": "الاختبار بالخصائص لدفاتر الأستاذ"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "11-testing-concurrency-bugs",
+          "title": {
+            "en": "Testing concurrency bugs",
+            "ar": "اختبار أخطاء التزامن"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "11-test-data-pii-safety",
+          "title": {
+            "en": "Test data and PII safety",
+            "ar": "بيانات الاختبار وسلامة المعلومات الشخصية"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "11-cicd-regulated",
+          "title": {
+            "en": "CI/CD for regulated environments",
+            "ar": "CI/CD في البيئات المنظَّمة"
+          },
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "title": {
+        "en": "Capstone: Reference Bank Backend Blueprint",
+        "ar": "المشروع الختامي: مخطط نظام بنكي"
+      },
+      "lessons": [
+        {
+          "id": "12-architecture-blueprint",
+          "title": {
+            "en": "Full architecture diagram",
+            "ar": "المخطط المعماري الكامل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "12-end-to-end-walkthrough",
+          "title": {
+            "en": "End-to-end walkthrough: open account, deposit, transfer, card purchase, statement",
+            "ar": "جولة شاملة: فتح حساب، إيداع، تحويل، شراء ببطاقة، كشف حساب"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "12-build-order-roadmap",
+          "title": {
+            "en": "Suggested build order and milestone roadmap",
+            "ar": "ترتيب البناء المقترح وخريطة المراحل"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "12-production-readiness-checklist",
+          "title": {
+            "en": "Production readiness checklist",
+            "ar": "قائمة الجاهزية للإنتاج"
+          },
+          "status": "planned"
+        },
+        {
+          "id": "12-learning-roadmap-further-reading",
+          "title": {
+            "en": "Learning roadmap and further reading",
+            "ar": "خريطة التعلم وقراءات إضافية"
+          },
+          "status": "planned"
+        }
+      ]
+    }
+  ]
+}

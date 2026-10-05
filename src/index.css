@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root {
+  --font-latin: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+html[lang="ar"] body { font-family: var(--font-arabic); line-height: 1.8; }
+html[lang="en"] body { font-family: var(--font-latin); line-height: 1.6; }
+html[lang="ar"] body { letter-spacing: normal; font-style: normal; }
+
+code, pre, .mono { font-family: var(--font-mono); }
+
+/* theme */
+html[data-theme="dark"] body { background: #0b1220; color: #e5e7eb; }
+html[data-theme="light"] body { background: #f8fafc; color: #111827; }
+
+/* text size setting */
+html[data-textsize="large"] body { font-size: 1.15rem; }
+html[data-textsize="xlarge"] body { font-size: 1.3rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+html[data-reducemotion="true"] *, html[data-reducemotion="true"] *::before, html[data-reducemotion="true"] *::after {
+  animation: none !important; transition: none !important;
+}
