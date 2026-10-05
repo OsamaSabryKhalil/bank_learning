@@ -1,0 +1,330 @@
+[
+  {
+    "id": "ledger",
+    "en": "Ledger",
+    "ar": "دفتر الأستاذ",
+    "keep_latin": false,
+    "definition": {
+      "en": "The permanent, append-only record of every money movement in the bank.",
+      "ar": "السجل الدائم الذي يُضاف إليه فقط، لكل حركة مالية في البنك."
+    },
+    "ar_aliases": [
+      "دفتر الاستاذ"
+    ],
+    "related": [
+      "journal-entry",
+      "double-entry"
+    ]
+  },
+  {
+    "id": "double-entry",
+    "en": "Double-entry bookkeeping",
+    "ar": "القيد المزدوج",
+    "keep_latin": false,
+    "definition": {
+      "en": "Every movement is recorded as equal debits and credits, so the books always balance.",
+      "ar": "تُسجَّل كل حركة كمدين ودائن متساويين، فتبقى الدفاتر متوازنة دائمًا."
+    },
+    "ar_aliases": [
+      "القيد المزدوج"
+    ],
+    "related": [
+      "ledger",
+      "journal-entry"
+    ]
+  },
+  {
+    "id": "journal-entry",
+    "en": "Journal entry",
+    "ar": "قيد اليومية",
+    "keep_latin": false,
+    "definition": {
+      "en": "A balanced group of debit and credit lines posted to the ledger at once.",
+      "ar": "مجموعة متوازنة من أسطر المدين والدائن تُرحَّل إلى دفتر الأستاذ دفعة واحدة."
+    },
+    "ar_aliases": [
+      "قيود اليومية",
+      "قيد يومية"
+    ],
+    "related": [
+      "posting",
+      "double-entry"
+    ]
+  },
+  {
+    "id": "posting",
+    "en": "Posting",
+    "ar": "الترحيل",
+    "keep_latin": false,
+    "definition": {
+      "en": "The act of applying a journal entry to account balances.",
+      "ar": "تطبيق قيد اليومية على أرصدة الحسابات."
+    },
+    "ar_aliases": [
+      "ترحيل"
+    ],
+    "related": [
+      "journal-entry"
+    ]
+  },
+  {
+    "id": "minor-unit",
+    "en": "Minor unit",
+    "ar": "الوحدة الصغرى",
+    "keep_latin": false,
+    "definition": {
+      "en": "The smallest currency unit, stored as an integer; for USD it is the cent.",
+      "ar": "أصغر وحدة عملة، تُخزَّن عددًا صحيحًا؛ للدولار هي السنت."
+    },
+    "ar_aliases": [
+      "الوحده الصغري"
+    ],
+    "related": [
+      "currency-exponent"
+    ]
+  },
+  {
+    "id": "currency-exponent",
+    "en": "Currency exponent",
+    "ar": "أس العملة",
+    "keep_latin": false,
+    "definition": {
+      "en": "Number of decimal digits of a currency: 0 for JPY, 2 for USD, 3 for KWD.",
+      "ar": "عدد الخانات العشرية للعملة: 0 للين الياباني، 2 للدولار، 3 للدينار الكويتي."
+    },
+    "ar_aliases": [
+      "اس العمله"
+    ],
+    "related": [
+      "minor-unit"
+    ]
+  },
+  {
+    "id": "trial-balance",
+    "en": "Trial balance",
+    "ar": "ميزان المراجعة",
+    "keep_latin": false,
+    "definition": {
+      "en": "A check that total debits equal total credits per currency.",
+      "ar": "تحقق من أن مجموع المدين يساوي مجموع الدائن لكل عملة."
+    },
+    "ar_aliases": [
+      "ميزان المراجعه"
+    ],
+    "related": [
+      "double-entry"
+    ]
+  },
+  {
+    "id": "reversal",
+    "en": "Reversal entry",
+    "ar": "القيد العكسي",
+    "keep_latin": false,
+    "definition": {
+      "en": "A mirrored entry that cancels a mistaken posting; records are never deleted.",
+      "ar": "قيد معاكس يلغي ترحيلًا خاطئًا؛ لا تُحذف السجلات أبدًا."
+    },
+    "ar_aliases": [
+      "القيد العكسي"
+    ],
+    "related": [
+      "immutable-record"
+    ]
+  },
+  {
+    "id": "immutable-record",
+    "en": "Immutable record",
+    "ar": "سجل غير قابل للتغيير",
+    "keep_latin": false,
+    "definition": {
+      "en": "A record that is never updated or deleted after creation; errors are fixed by compensating entries.",
+      "ar": "سجل لا يُعدَّل ولا يُحذف بعد إنشائه؛ تُصحَّح الأخطاء بقيود تعويضية."
+    },
+    "ar_aliases": [
+      "سجل غير قابل للتغيير"
+    ],
+    "related": [
+      "reversal"
+    ]
+  },
+  {
+    "id": "available-balance",
+    "en": "Available balance",
+    "ar": "الرصيد المتاح",
+    "keep_latin": false,
+    "definition": {
+      "en": "The balance a customer may actually spend, after subtracting holds.",
+      "ar": "الرصيد الذي يمكن للعميل إنفاقه فعليًا بعد خصم الحجوزات."
+    },
+    "ar_aliases": [
+      "الرصيد المتاح"
+    ],
+    "related": [
+      "hold"
+    ]
+  },
+  {
+    "id": "hold",
+    "en": "Hold",
+    "ar": "الحجز",
+    "keep_latin": false,
+    "definition": {
+      "en": "A temporary reservation of funds, for example during card authorization.",
+      "ar": "حجز مؤقت للأموال، مثلًا أثناء تصريح البطاقة."
+    },
+    "ar_aliases": [
+      "الحجز",
+      "حجز"
+    ],
+    "related": [
+      "available-balance",
+      "authorization"
+    ]
+  },
+  {
+    "id": "authorization",
+    "en": "Authorization",
+    "ar": "التصريح",
+    "keep_latin": false,
+    "definition": {
+      "en": "A scheme's confirmation that funds exist and are reserved for a payment.",
+      "ar": "تأكيد من نظام الدفع بوجود الأموال وحجزها لدفعة."
+    },
+    "ar_aliases": [
+      "التصريح"
+    ],
+    "related": [
+      "hold",
+      "capture"
+    ]
+  },
+  {
+    "id": "capture",
+    "en": "Capture",
+    "ar": "التحصيل",
+    "keep_latin": false,
+    "definition": {
+      "en": "Converting an authorized card payment into a real charge.",
+      "ar": "تحويل دفعة بطاقة مصرَّح بها إلى خصم فعلي."
+    },
+    "ar_aliases": [
+      "التحصيل"
+    ],
+    "related": [
+      "authorization"
+    ]
+  },
+  {
+    "id": "idempotency",
+    "en": "Idempotency",
+    "ar": "الاندماج",
+    "keep_latin": true,
+    "definition": {
+      "en": "Performing the same request twice has the same effect as once.",
+      "ar": "تنفيذ الطلب نفسه مرتين له الأثر نفسه كتنفيذه مرة واحدة."
+    },
+    "ar_aliases": [
+      "الاندماج",
+      "عدم التكرار"
+    ],
+    "related": [
+      "idempotency-key"
+    ]
+  },
+  {
+    "id": "idempotency-key",
+    "en": "Idempotency key",
+    "ar": "مفتاح الاندماج",
+    "keep_latin": true,
+    "definition": {
+      "en": "A client-supplied unique key that lets the server deduplicate retried requests.",
+      "ar": "مفتاح فريد يرسله العميل فيتمكن الخادم من إزالة تكرار الطلبات المعاد إرسالها."
+    },
+    "ar_aliases": [
+      "مفتاح الاندماج"
+    ],
+    "related": [
+      "idempotency"
+    ]
+  },
+  {
+    "id": "acid",
+    "en": "ACID",
+    "ar": "ACID",
+    "keep_latin": true,
+    "definition": {
+      "en": "Atomicity, Consistency, Isolation, Durability: the four guarantees of a transaction.",
+      "ar": "الذرية والاتساق والعزل والمتانة: الضمانات الأربعة للمعاملة."
+    },
+    "ar_aliases": [],
+    "related": [
+      "isolation-level",
+      "transaction"
+    ]
+  },
+  {
+    "id": "isolation-level",
+    "en": "Isolation level",
+    "ar": "مستوى العزل",
+    "keep_latin": false,
+    "definition": {
+      "en": "How much a transaction sees of other in-flight transactions.",
+      "ar": "مقدار ما تراه المعاملة من المعاملات الأخرى الجارية."
+    },
+    "ar_aliases": [
+      "مستوي العزل"
+    ],
+    "related": [
+      "acid"
+    ]
+  },
+  {
+    "id": "transaction",
+    "en": "Transaction",
+    "ar": "المعاملة",
+    "keep_latin": false,
+    "definition": {
+      "en": "A group of operations that either all succeed or all have no effect.",
+      "ar": "مجموعة عمليات إما أن تنجح كلها أو لا أثر لأي منها."
+    },
+    "ar_aliases": [
+      "المعامله"
+    ],
+    "related": [
+      "acid"
+    ]
+  },
+  {
+    "id": "reconciliation",
+    "en": "Reconciliation",
+    "ar": "المطابقة",
+    "keep_latin": false,
+    "definition": {
+      "en": "Comparing the bank's internal records against external statements to find differences.",
+      "ar": "مقارنة سجلات البنك الداخلية بالكشوفات الخارجية لإيجاد الفروقات."
+    },
+    "ar_aliases": [
+      "المطابقه",
+      "التسوية"
+    ],
+    "related": [
+      "settlement"
+    ]
+  },
+  {
+    "id": "settlement",
+    "en": "Settlement",
+    "ar": "التسوية",
+    "keep_latin": false,
+    "definition": {
+      "en": "The final transfer of funds that completes a payment between institutions.",
+      "ar": "النقل النهائي للأموال الذي يُتم دفعة بين المؤسسات."
+    },
+    "ar_aliases": [
+      "التسويه"
+    ],
+    "related": [
+      "reconciliation"
+    ]
+  }
+]

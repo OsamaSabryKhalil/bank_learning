@@ -1,0 +1,11 @@
+[
+  { "allow": "www.w3.org/2000/svg", "reason": "SVG XML namespace identifier, never fetched" },
+  { "allow": "www.w3.org/1999/xlink", "reason": "SVG xlink namespace identifier, never fetched" },
+  { "allow": "www.w3.org/1998/Math/MathML", "reason": "MathML XML namespace identifier, never fetched" },
+  { "allow": "www.w3.org/XML/1998/namespace", "reason": "XML namespace identifier, never fetched" },
+  { "allow": "locize.com", "reason": "Doc URL embedded in i18next error strings; never fetched" },
+  { "allow": "www.i18next.com", "reason": "Doc URL embedded in i18next error strings; never fetched" },
+  { "allow": "react.dev/errors", "reason": "React error-code doc URLs in dev warning strings; never fetched" },
+  { "allow": "reactrouter.com", "reason": "React Router doc URLs in warning strings; never fetched" },
+  { "allow": "http://localhost", "reason": "Literal string in React/Router messages, not a fetched resource" }
+]

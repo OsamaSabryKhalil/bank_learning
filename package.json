@@ -1,0 +1,57 @@
+{
+  "name": "bank-backend-academy",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && npm run build:search",
+    "preview": "node serve.mjs",
+    "check": "npm run typecheck && npm run lint && npm run lint:rtl && npm run validate:content && npm run test:unit",
+    "typecheck": "tsc -b",
+    "lint": "eslint src scripts --ext .ts,.tsx",
+    "lint:rtl": "node scripts/lint-rtl.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
+    "build:search": "node scripts/build-search.mjs",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "progress:sync": "node scripts/progress-sync.mjs",
+    "smoke:lesson": "node scripts/smoke-lesson.mjs",
+    "verify:offline": "node scripts/verify-offline.mjs",
+    "package:offline": "node scripts/package-offline.mjs",
+    "vendor:deps": "node scripts/vendor-deps.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "5.3.0",
+    "flexsearch": "0.8.1",
+    "i18next": "25.10.10",
+    "idb-keyval": "6.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-i18next": "16.6.6",
+    "react-router-dom": "7.18.4",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "@vitest/coverage-v8": "3.2.7",
+    "ajv": "8.20.0",
+    "eslint": "9.39.5",
+    "fast-check": "4.10.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0",
+    "vite": "7.3.6",
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "3.2.7"
+  }
+}
